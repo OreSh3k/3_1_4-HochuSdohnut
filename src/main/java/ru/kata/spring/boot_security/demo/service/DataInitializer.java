@@ -47,7 +47,7 @@ public class DataInitializer implements CommandLineRunner {
         if (!userService.findByUsername("admin").isPresent()) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin"));
+            admin.setPassword(("admin"));
             admin.setEmail("admin@mail.com");
             admin.setRoles(Set.of(adminRole, userRole));
 
