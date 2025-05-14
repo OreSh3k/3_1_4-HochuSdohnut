@@ -24,12 +24,6 @@ public class UserController {
     }
 
 
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "login";
-    }
-
-
     //Список всех юзеров
     @GetMapping("/users")
     public String showUsers(Model model) {
