@@ -94,6 +94,14 @@ public class User implements UserDetails {
         return email;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
@@ -118,12 +126,12 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.password;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return this.username;
+        return username;
     }
 
     @Override
@@ -145,7 +153,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return enabled;
     }
-
 
 
     @Override

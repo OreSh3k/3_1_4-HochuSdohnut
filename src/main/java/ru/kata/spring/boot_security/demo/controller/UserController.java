@@ -4,11 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Controller
@@ -20,6 +22,13 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
+
+
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login";
+    }
+
 
     //Список всех юзеров
     @GetMapping("/users")
@@ -41,12 +50,18 @@ public class UserController {
             @RequestParam("name") String name,
             @RequestParam("lastName") String lastName,
             @RequestParam("email") String email,
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("role") Set<Role> role,
             Model model) {
 
         User user = new User();
         user.setName(name);
         user.setLastName(lastName);
         user.setEmail(email);
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setRoles(role);
 
         userService.addUser(user);
 

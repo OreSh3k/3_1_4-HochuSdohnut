@@ -1,5 +1,7 @@
 package ru.kata.spring.boot_security.demo.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.User;
@@ -12,20 +14,29 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     @Override
     public void addUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
-    @Transactional()
+    @Transactional
+    @Override
     public void updateUser(User user) {
+        if (!user.getPassword().equals(userRepository.findById(user.getId()).get().getPassword())) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         userRepository.save(user);
     }
 
@@ -42,15 +53,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findUserByNameOrEmail(String name, String email) {
-        if(!name.isEmpty() && !email.isEmpty()) {
+        if (!name.isEmpty() && !email.isEmpty()) {
             return userRepository.findByNameAndEmail(name, email);
-        }else if(!name.isEmpty()) {
+        } else if (!name.isEmpty()) {
             return userRepository.findByName(name);
-        }else if(!email.isEmpty()) {
+        } else if (!email.isEmpty()) {
             return userRepository.findByEmail(email);
-        }else{
+        } else {
             return new ArrayList<User>();
         }
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
 
