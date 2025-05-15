@@ -2,7 +2,6 @@ package ru.kata.spring.boot_security.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
@@ -16,15 +15,15 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserService userService;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final AdminService adminService;
 
     @Autowired
     public DataInitializer(UserService userService,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           AdminService adminService) {
         this.userService = userService;
         this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.adminService = adminService;
     }
 
     @Override
@@ -51,7 +50,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setEmail("admin@mail.com");
             admin.setRoles(Set.of(adminRole, userRole));
 
-            userService.addUser(admin);
+            adminService.addUser(admin);
             System.out.println("Создан администратор: admin / admin");
         }
     }

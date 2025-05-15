@@ -20,10 +20,10 @@ public class SuccessUserHandler implements AuthenticationSuccessHandler {
 
         if (roles.contains("ROLE_ADMIN")) {
             System.out.println("ZHOPA1");
-            response.sendRedirect("/admin");
+            response.sendRedirect("/users");
         } else if (roles.contains("ROLE_USER")) {
             System.out.println("ZHOPA2");
-            response.sendRedirect("/user");
+            response.sendRedirect("/users");
         } else {
             System.out.println("ZHOPA3");
             response.sendRedirect("/");

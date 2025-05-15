@@ -24,12 +24,6 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
-    @Override
-    public void addUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-    }
 
     @Transactional
     @Override
@@ -40,16 +34,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    @Transactional
-    public void deleteUserById(int id) {
-        userRepository.deleteById(id);
-    }
-
-    @Transactional
-    @Override
-    public Optional<User> findUser(int id) {
-        return userRepository.findById(id);
-    }
 
     @Override
     public List<User> findUserByNameOrEmail(String name, String email) {
@@ -75,5 +59,12 @@ public class UserServiceImpl implements UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    @Transactional
+    @Override
+    public Optional<User> findUser(int id) {
+        return userRepository.findById(id);
+    }
 }
+
 

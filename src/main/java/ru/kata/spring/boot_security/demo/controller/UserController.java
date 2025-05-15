@@ -3,14 +3,15 @@ package ru.kata.spring.boot_security.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.Role;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 @Controller
@@ -24,44 +25,6 @@ public class UserController {
     }
 
 
-    //Список всех юзеров
-    @GetMapping("/users")
-    public String showUsers(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
-        return "users";
-    }
-
-
-    // Форма для добавления
-    @GetMapping("/addUserForm")
-    public String showAddUserForm() {
-        return "addUser";  // Имя HTML страницы (addUserForm.html)
-    }
-
-    //Добавление юзера
-    @PostMapping("/add")
-    public String add(
-            @RequestParam("name") String name,
-            @RequestParam("lastName") String lastName,
-            @RequestParam("email") String email,
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam("role") Set<Role> role,
-            Model model) {
-
-        User user = new User();
-        user.setName(name);
-        user.setLastName(lastName);
-        user.setEmail(email);
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setRoles(role);
-
-        userService.addUser(user);
-
-        return "redirect:/users";
-    }
-
     //Форма для редактирования
     @GetMapping("/editUserForm")
     public String showEditUserForm(@RequestParam("id") int id, Model model) {
@@ -70,7 +33,6 @@ public class UserController {
         return "editUser"; // Это HTML-страница для редактирования
     }
 
-
     //Ред. юзера
     @PostMapping("/updateUser")
     public String updateUser(@ModelAttribute("user") User user) {
@@ -78,24 +40,13 @@ public class UserController {
         return "redirect:/users";
     }
 
-    //Удаления юзера
-    @PostMapping("/deleteUser")
-    public String deleteUser(@RequestParam("id") int id) {
-        userService.deleteUserById(id);
-        return "redirect:/users";
+    //Список всех юзеров
+    @GetMapping("/users")
+    public String showUsers(Model model) {
+        model.addAttribute("users", userService.getAllUsers());
+        return "users";
     }
 
-
-    @GetMapping("/testAdd")
-    @ResponseBody
-    public String testAdd() {
-        User user = new User();
-        user.setName("Test");
-        user.setLastName("User");
-        user.setEmail("test@example.com");
-        userService.addUser(user);
-        return "OK";
-    }
 
     @GetMapping("/search")
     public String searchUser(@RequestParam(required = false) String name,
