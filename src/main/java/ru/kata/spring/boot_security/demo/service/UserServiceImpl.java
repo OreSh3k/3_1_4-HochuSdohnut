@@ -28,10 +28,30 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUser(User user) {
-        if (!user.getPassword().equals(userRepository.findById(user.getId()).get().getPassword())) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Обновляем пароль только если он изменился
+        if (!user.getPassword().isEmpty() &&
+                !passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        userRepository.save(user);
+
+        // Обновляем остальные поля
+        if (user.getUsername() != null && !user.getUsername().isEmpty()) {
+            existingUser.setUsername(user.getUsername());
+        }
+        if (user.getName() != null) {
+            existingUser.setName(user.getName());
+        }
+        if (user.getLastName() != null) {
+            existingUser.setLastName(user.getLastName());
+        }
+        if (user.getEmail() != null) {
+            existingUser.setEmail(user.getEmail());
+        }
+
+        userRepository.save(existingUser);
     }
 
 
