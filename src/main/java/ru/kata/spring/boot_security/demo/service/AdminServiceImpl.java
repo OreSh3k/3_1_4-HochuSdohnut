@@ -11,19 +11,16 @@ import ru.kata.spring.boot_security.demo.repository.UserRepository;
 public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AdminServiceImpl(UserRepository userRepository,
-                            PasswordEncoder passwordEncoder) {
+    public AdminServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     @Override
     public void addUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(user.getPassword());
         userRepository.save(user);
     }
 

@@ -34,7 +34,6 @@ public class AdminController {
 
     }
 
-
     //Удаления юзера
     @PostMapping("/deleteUser")
     public String deleteUser(@RequestParam("id") int id) {
@@ -68,6 +67,8 @@ public class AdminController {
         user.setRoles(userRoles);
 
         adminService.addUser(user);
+
+        System.out.println("Пользователь создан");
         return "redirect:/users";
     }
 
