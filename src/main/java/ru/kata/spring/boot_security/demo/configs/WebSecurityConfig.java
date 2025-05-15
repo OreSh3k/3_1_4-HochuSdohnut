@@ -30,8 +30,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/login", "/css/**", "/js/**").permitAll()
-                .antMatchers("/admin/**","addUserForm", "/add").hasRole("ADMIN")
+                .antMatchers("/", "/login", "/css/**", "/js/**","/accessDenied").permitAll()
+                .antMatchers("/admin/**","/addUserForm", "/add",
+                        "/deleteUser","/editUserForm","/updateUser").hasRole("ADMIN")
                 .antMatchers("/user","/users").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
                 .and()
@@ -45,7 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
-                .permitAll();
+                .permitAll()
+                .and().exceptionHandling().accessDeniedPage("/accessDenied");
     }
 
     @Override

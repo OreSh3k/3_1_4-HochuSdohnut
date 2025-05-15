@@ -57,5 +57,10 @@ public class UserController {
         return "users";
     }
 
+    @GetMapping("/accessDenied")
+    public String accessDenied() {
+        return "accessDenied";
+    }
+
 
 }
