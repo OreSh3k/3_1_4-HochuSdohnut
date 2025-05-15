@@ -5,6 +5,7 @@
 </head>
 <body>
 <h1>User, welcome spring boot security page!</h1>
+
 <!-- В любом шаблоне -->
 <div sec:authorize="isAuthenticated()">
     <form th:action="@{/logout}" method="post">
