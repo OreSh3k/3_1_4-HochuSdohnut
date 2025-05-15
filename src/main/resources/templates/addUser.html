@@ -7,24 +7,31 @@
 </head>
 <body>
 <h1>Add new User</h1>
-<form th:action="@{/addUser}" th:object="${user}" method="post">
+<form th:action="@{/addUser}" method="post">
 
-    <label for="name">First Name:</label>
-    <input type="text" id="name" th:field="*{name}" required><br><br>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br><br>
 
     <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" th:field="*{lastName}" required><br><br>
+    <input type="text" id="lastName" name="lastName" required><br><br>
 
     <label for="email">Email:</label>
-    <input type="email" id="email" th:field="*{email}" required><br><br>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required><br><br>
 
     <label for="password">Password:</label>
-    <input type="password" id="password" th:field="*{password}" required><br><br>
+    <input type="password" id="password" name="password" required><br><br>
 
-    <label for="role">Role:</label>
-    <input type="text" id="role" th:field="*{roles}" required><br><br>
+    <label for="roles">Roles:</label>
+    <select id="roles" name="roles" multiple>
+        <option th:each="role : ${allRoles}"
+                th:value="${role.id}"
+                th:text="${role.name}"></option>
+    </select><br><br>
 
-    <input type="submit" value="Send">
+    <input type="submit" value="Add User">
 </form>
 </body>
 </html>
