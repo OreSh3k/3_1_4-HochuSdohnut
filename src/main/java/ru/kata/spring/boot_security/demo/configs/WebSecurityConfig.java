@@ -29,15 +29,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable() // Отключить CSRF для API
                 .authorizeRequests()
-                .antMatchers("/", "/login", "/css/**", "/js/**","/accessDenied").permitAll()
-                .antMatchers("/admin/**","/addUserForm", "/add",
-                        "/deleteUser","/editUserForm","/updateUser").hasRole("ADMIN")
-                .antMatchers("/user","/users").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/", "/login", "/css/**", "/js/**", "/accessDenied").permitAll()
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
                 .loginProcessingUrl("/login")
                 .successHandler(successUserHandler)
                 .failureUrl("/login?error=true")
@@ -47,8 +48,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .permitAll()
-                .and().exceptionHandling().accessDeniedPage("/accessDenied");
+                .and()
+                .httpBasic(); // ⬅️ для работы JS/FETCH на /api/*
     }
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
