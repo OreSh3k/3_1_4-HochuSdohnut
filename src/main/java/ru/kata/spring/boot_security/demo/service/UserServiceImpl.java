@@ -9,10 +9,7 @@ import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,19 +62,28 @@ public class UserServiceImpl implements UserService {
             return false;
         }
 
-        public User save(User user) {
+    public User save(User user) {
+        // Инициализация пароля
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Получаем роли или создаем новый Set, если null
+        Set<Role> roles = user.getRoles() != null ? user.getRoles() : new HashSet<>();
 
-            // Мапим роли из входящих данных
-            Set<Role> roles = user.getRoles().stream()
-                    .map(role -> roleRepository.findByName(role.getName())
-                            .orElseThrow(() -> new RuntimeException("Role not found: " + role.getName())))
-                    .collect(Collectors.toSet());
-
-            user.setRoles(roles);
-
-            return userRepository.save(user);
+        // Если роли пустые, устанавливаем роль по умолчанию
+        if (roles.isEmpty()) {
+            Role defaultRole = roleRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new RuntimeException("Default role ROLE_USER not found"));
+            roles.add(defaultRole);
         }
+
+        // Маппинг ролей из базы данных
+        Set<Role> mappedRoles = roles.stream()
+                .map(role -> roleRepository.findByName(role.getName())
+                        .orElseThrow(() -> new RuntimeException("Role not found: " + role.getName())))
+                .collect(Collectors.toSet());
+
+        user.setRoles(mappedRoles);
+        return userRepository.save(user);
+    }
     }
 

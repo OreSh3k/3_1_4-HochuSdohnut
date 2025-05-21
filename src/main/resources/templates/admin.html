@@ -25,7 +25,7 @@
   <h4>Add New User</h4>
   <form id="addUserForm" class="row g-2">
     <input class="form-control" placeholder="Username" name="username" required>
-    <input class="form-control" placeholder="Password" name="password" required>
+    <input class="form-control" placeholder="Password" name="password" type="password" required>
     <input class="form-control" placeholder="Name" name="name">
     <input class="form-control" placeholder="Last Name" name="lastName">
     <input class="form-control" placeholder="Email" name="email">
@@ -84,7 +84,7 @@
         <td>${user.username}</td>
         <td>${user.name || ''} ${user.lastName || ''}</td>
         <td>${user.email || ''}</td>
-        <td>${user.roles.join(', ')}</td>
+        <td>${user.roles.map(r => r.name).join(', ')}</td>
         <td>
           <button class="btn btn-sm btn-primary" onclick="openEditModal(${user.id})">Edit</button>
           <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">Delete</button>
@@ -106,7 +106,7 @@
       name: formData.get('name'),
       lastName: formData.get('lastName'),
       email: formData.get('email'),
-      roles: roles.map(r => ({ name: r }))
+      roles: roles.length > 0 ? roles : [{ name: "ROLE_USER" }] // По умолчанию ROLE_USER
     };
 
     const res = await fetch(apiUrl, {
@@ -133,7 +133,7 @@
     form.lastName.value = user.lastName || '';
     form.email.value = user.email || '';
     Array.from(form.roles.options).forEach(opt => {
-      opt.selected = user.roles.includes(opt.value);
+      opt.selected = user.roles.some(role => role.name === opt.value);
     });
 
     new bootstrap.Modal(document.getElementById('editUserModal')).show();

@@ -7,6 +7,7 @@ import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,9 +55,13 @@ public class AdminRestController {
                 : ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<User> addUser(@RequestBody User user) {
-        User created = userService.save(user); // или add(user)
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        // Если роли не указаны, инициализируем пустой Set
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+        User savedUser = userService.save(user);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 }
