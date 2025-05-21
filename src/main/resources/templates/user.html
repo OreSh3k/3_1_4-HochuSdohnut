@@ -1,17 +1,85 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html lang="en">
 <head>
-    <title>Spring Security Example</title>
+    <meta charset="UTF-8">
+    <title>User Panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-<h1>User, welcome spring boot security page!</h1>
+<!-- Добавленная панель навигации с кнопкой Logout -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand">User Panel</span>
+        <div class="d-flex">
+            <button class="btn btn-outline-danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+</nav>
 
-<!-- В любом шаблоне -->
-<div sec:authorize="isAuthenticated()">
-    <form th:action="@{/logout}" method="post">
-        <button type="submit">Выйти</button>
-    </form>
+<div class="container mt-4">
+    <h2>User Panel</h2>
+
+    <!-- 📋 Таблица пользователей -->
+    <table class="table table-bordered" id="usersTable">
+        <thead>
+        <tr>
+            <th>ID</th><th>Username</th><th>Name</th><th>Email</th><th>Roles</th><th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="usersBody">
+        <!-- users will be loaded here -->
+        </tbody>
+    </table>
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const apiUrl = '/api/user/users';
+
+    // Функция для выхода из системы
+    async function logout() {
+        try {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                window.location.href = '/login';
+            } else {
+                alert('Logout failed');
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Error during logout');
+        }
+    }
+
+
+    // Загрузка всех пользователей
+    async function loadUsers() {
+        const res = await fetch(apiUrl);
+        const users = await res.json();
+        const tbody = document.getElementById('usersBody');
+        tbody.innerHTML = '';
+        users.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.username}</td>
+        <td>${user.name || ''} ${user.lastName || ''}</td>
+        <td>${user.email || ''}</td>
+        <td>${user.roles.map(r => r.name).join(', ')}</td>
+      `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Инициализация
+    loadUsers();
+</script>
 </body>
 </html>

@@ -11,6 +11,8 @@ import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")
@@ -28,5 +30,13 @@ public class UserRestController {
         return userService.findByUsername(principal.getName())
                 .map(user -> ResponseEntity.ok(new UserDTO(user)))
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    // 🔍 Получить всех пользователей
+    @GetMapping("/users")
+    public List<UserDTO> findAllUsers() {
+        return userService.findAllUsers().stream()
+                .map(UserDTO::new)
+                .collect(Collectors.toList());
     }
 }
