@@ -106,7 +106,7 @@
       name: formData.get('name'),
       lastName: formData.get('lastName'),
       email: formData.get('email'),
-      roles: roles.length > 0 ? roles : [{ name: "ROLE_USER" }] // По умолчанию ROLE_USER
+      roles: roles
     };
 
     const res = await fetch(apiUrl, {

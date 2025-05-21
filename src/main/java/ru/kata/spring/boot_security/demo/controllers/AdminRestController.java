@@ -55,7 +55,7 @@ public class AdminRestController {
                 : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
+    @PostMapping("/users")
     public ResponseEntity<User> addUser(@RequestBody User user) {
         // Если роли не указаны, инициализируем пустой Set
         if (user.getRoles() == null) {
