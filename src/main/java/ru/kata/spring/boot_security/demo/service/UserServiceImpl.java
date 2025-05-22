@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.RoleRepository;
@@ -41,18 +42,26 @@ public class UserServiceImpl implements UserService {
             return userRepository.findById(id);
         }
 
-        @Override
-        public Optional<User> updateUser(int id, User updatedUser) {
-            return userRepository.findById(id).map(existingUser -> {
-                existingUser.setName(updatedUser.getName());
-                existingUser.setLastName(updatedUser.getLastName());
-                existingUser.setEmail(updatedUser.getEmail());
-                existingUser.setUsername(updatedUser.getUsername());
-                existingUser.setRoles(updatedUser.getRoles());
-                return userRepository.save(existingUser);
-            });
-        }
+    @Override
+    public Optional<User> updateUser(int id, UserDTO userDTO) {
+        return userRepository.findById(id).map(existingUser -> {
+            // 🔁 Обновление полей
+            existingUser.setUsername(userDTO.getUsername());
+            existingUser.setName(userDTO.getName());
+            existingUser.setLastName(userDTO.getLastName());
+            existingUser.setEmail(userDTO.getEmail());
 
+            // 🔄 Преобразование ролей по именам
+            Set<Role> roles = userDTO.getRoles().stream()
+                    .map(roleName -> roleRepository.findByName(roleName)
+                            .orElseThrow(() -> new RuntimeException("Роль не найдена: " + roleName)))
+                    .collect(Collectors.toSet());
+
+            existingUser.setRoles(roles);
+
+            return userRepository.save(existingUser);
+        });
+    }
         @Override
         public boolean deleteById(int id) {
             if (userRepository.existsById(id)) {

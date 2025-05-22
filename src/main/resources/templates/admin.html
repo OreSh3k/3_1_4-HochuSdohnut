@@ -115,7 +115,7 @@
         <td>${user.id}</td>
         <td>${user.username}</td>
         <td>${user.name || ''}</td>
-        <t>${user.lastName || ''}</td>
+        <td>${user.lastName || ''}</td>
         <td>${user.email || ''}</td>
         <td>${user.roles.join(', ')}</td>
         <td>
@@ -176,15 +176,18 @@
   document.getElementById('editUserForm').addEventListener('submit', async e => {
     e.preventDefault();
     const form = e.target;
-    const roles = Array.from(form.roles.selectedOptions).map(opt => ({ name: opt.value }));
+    const roles = Array.from(form.roles.selectedOptions).map(opt => opt.value);
     const user = {
       id: form.id.value,
       username: form.username.value,
       name: form.name.value,
       lastName: form.lastName.value,
       email: form.email.value,
-      roles: roles.values()
+      roles: roles
     };
+
+    // ✅ ВСТАВЬ ЭТУ СТРОКУ
+    console.log("➡️ Отправляемый пользователь:", JSON.stringify(user, null, 2));
 
     const res = await fetch(`${apiUrl}/${user.id}`, {
       method: 'PUT',

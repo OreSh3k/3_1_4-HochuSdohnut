@@ -1,246 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Users list</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        form.inline {
-            display: inline;
-        }
-        .search-form {
-            margin-bottom: 20px;
-        }
-        .search-form input {
-            padding: 4px;
-            margin-right: 8px;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <title>User Panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
 </head>
 <body>
 
-<div class="auth-section" id="authSection">
-    <a href="/login" id="loginLink"><button>Login</button></a>
-    <form id="logoutForm" action="/logout" method="post" style="display: inline;">
-        <button type="submit" id="logoutBtn" style="display: none;">Logout</button>
-    </form>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand">User Panel</span>
+        <div class="d-flex">
+            <button class="btn btn-outline-danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h2>User Data</h2>
+
+    <table class="table table-bordered" id="usersTable">
+        <thead>
+        <tr>
+            <th>ID</th><th>Username</th><th>Name</th><th>LastName</th><th>Email</th><th>Roles</th>
+        </tr>
+        </thead>
+        <tbody id="usersBody">
+        <!-- users will be loaded here -->
+        </tbody>
+    </table>
 </div>
 
-<h1>Users List</h1>
-
-<!-- 🔍 Форма поиска -->
-<form class="search-form" id="searchForm">
-    <input type="text" name="name" placeholder="Имя">
-    <input type="text" name="email" placeholder="Email">
-    <button type="submit">Поиск</button>
-    <a href="#" id="resetSearch">Сбросить</a>
-</form>
-
-<table>
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>LastName</th>
-        <th>Email</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody id="usersTableBody">
-        <!-- Сюда должны подставляться значение из скрипта Fetch API  -->
-    </tbody>
-</table>
-
-<!-- Кнопка для перехода на форму добавления нового пользователя -->
-<form action="/addUserForm" method="get">
-    <button type="submit">Add new user</button>
-</form>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function (){
-        const authSection = document.getElementById('authSection');
-        const loginLink = document.getElementById('loginLink');
-        const logoutForm = document.getElementById('logoutForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const searchForm = document.getElementById('searchForm');
-        const resetSearch = document.getElementById('resetSearch');
-        const usersTableBody = document.getElementById('usersTableBody');
+    const apiUrl = '/api/user/users';
 
-        // Проверка аутентификации
-        function checkAuth() {
-            fetch('/api/auth/check')
-                .then(response => {
-                    if (!response.ok) throw new Error('Not authenticated');
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.authenticated) {
-                        loginLink.style.display = 'none';
-                        logoutBtn.style.display = 'inline';
-                    } else {
-                        loginLink.style.display = 'inline';
-                        logoutBtn.style.display = 'none';
-                    }
-                    return data.authenticated;
-                })
-                .catch(() => {
-                    loginLink.style.display = 'inline';
-                    logoutBtn.style.display = 'none';
-                    return false;
-                });
-        }
-
-        // Загрузка пользователей
-        function loadUsers(searchParams = {}) {
-            let url = '/api/users';
-            const params = new URLSearchParams(searchParams).toString();
-
-            if (params) {
-                url += `?${params}`;
-            }
-
-            fetch(url, {
-                credentials: 'include' // Важно для передачи куки с сессией
-            })
-                .then(response => {
-                    if (response.status === 401) {
-                        window.location.href = '/login';
-                        return;
-                    }
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(users => {
-                    if (users) renderUsers(users);
-                })
-                .catch(error => {
-                    console.error('Error fetching users:', error);
-                    usersTableBody.innerHTML = '<tr><td colspan="4">Error loading users</td></tr>';
-                });
-        }
-
-        // Рендеринг пользователей в таблицу
-        function renderUsers(users) {
-            usersTableBody.innerHTML = '';
-
-            if (users.length === 0) {
-                usersTableBody.innerHTML = '<tr><td colspan="4">No users found</td></tr>';
-                return;
-            }
-
-            users.forEach(user => {
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-                    <td>${user.name}</td>
-                    <td>${user.lastName}</td>
-                    <td>${user.email}</td>
-                    <td>
-                        <a href="/editUserForm?id=${user.id}">Edit</a>
-                        ${user.canDelete ? `
-                        <form class="inline" action="/api/users/${user.id}" method="POST">
-                            <input type="hidden" name="_method" value="DELETE"/>
-                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                            <button type="submit" onclick="return confirm('Удалить пользователя?')">Delete</button>
-                        </form>
-                        ` : ''}
-                    </td>
-                `;
-
-                usersTableBody.appendChild(row);
-            });
-        }
-
-        // Обработчики событий
-        logoutForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            fetch('/logout', {
-                method: 'POST',
-                credentials: 'include'
-            })
-                .then(() => {
-                    window.location.href = '/login';
-                });
-        });
-
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(searchForm);
-            const searchParams = {};
-
-            formData.forEach((value, key) => {
-                if (value) searchParams[key] = value;
-            });
-
-            loadUsers(searchParams);
-        });
-
-        resetSearch.addEventListener('click', function(e) {
-            e.preventDefault();
-            searchForm.reset();
-            loadUsers();
-        });
-
-        // Проверка аутентификации и загрузка пользователей при загрузке страницы
-        checkAuth().then(isAuthenticated => {
-            if (isAuthenticated) {
-                loadUsers();
-            } else {
+    async function logout() {
+        try {
+            const response = await fetch('/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            if (response.ok) {
                 window.location.href = '/login';
+            } else {
+                alert('Logout failed');
             }
-        });
-    });
-
-    // Обработчик для форм удаления
-    document.addEventListener('submit', function(e) {
-        if (e.target.method === 'POST' && e.target.querySelector('input[name="_method"][value="DELETE"]')) {
-            e.preventDefault();
-
-            if (confirm('Удалить пользователя?')) {
-                const form = e.target;
-                const url = form.action;
-                const csrfToken = form.querySelector('input[name="_csrf"]').value;
-
-                fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    credentials: 'include'
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.reload();
-                        } else if (response.status === 403) {
-                            alert('Недостаточно прав для удаления');
-                        } else {
-                            alert('Ошибка при удалении пользователя');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Ошибка при удалении пользователя');
-                    });
-            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Error during logout');
         }
-    });
+    }
+
+    async function loadUsers() {
+        try {
+            const res = await fetch(apiUrl);
+            if (!res.ok) throw new Error('Failed to fetch users');
+            const users = await res.json();
+            const tbody = document.getElementById('usersBody');
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${user.id}</td>
+          <td>${user.username}</td>
+          <td>${user.name || ''}</td>
+          <td>${user.lastName || ''}</td>
+          <td>${user.email || ''}</td>
+          <td>${user.roles.join(', ')}</td>
+        `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error('Error loading users:', error);
+        }
+    }
+
+    loadUsers();
 </script>
-
-
-
-
-
-
 </body>
 </html>

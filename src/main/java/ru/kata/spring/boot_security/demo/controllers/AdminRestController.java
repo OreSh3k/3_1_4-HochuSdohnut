@@ -41,8 +41,8 @@ public class AdminRestController {
 
     // ✏️ Обновить пользователя
     @PutMapping("/users/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody User updatedUser) {
-        return userService.updateUser(id, updatedUser)
+    public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody UserDTO updatedUserDTO) {
+        return userService.updateUser(id, updatedUserDTO)
                 .map(user -> ResponseEntity.ok(new UserDTO(user)))
                 .orElse(ResponseEntity.notFound().build());
     }
