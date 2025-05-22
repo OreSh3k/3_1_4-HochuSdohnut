@@ -183,7 +183,7 @@
       name: form.name.value,
       lastName: form.lastName.value,
       email: form.email.value,
-      roles: roles
+      roles: roles.values()
     };
 
     const res = await fetch(`${apiUrl}/${user.id}`, {
