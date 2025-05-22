@@ -28,7 +28,7 @@ public class SuccessUserHandler implements AuthenticationSuccessHandler {
 
         } else {
             System.out.println("ZHOPA3");
-            response.sendRedirect("/");
+            response.sendRedirect("/login");
         }
     }
 }

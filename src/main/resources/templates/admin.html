@@ -24,7 +24,7 @@
   <table class="table table-bordered" id="usersTable">
     <thead>
     <tr>
-      <th>ID</th><th>Username</th><th>Name</th><th>Email</th><th>Roles</th><th>Actions</th>
+      <th>ID</th><th>Username</th><th>Name</th><th>LastName</th><th>Email</th><th>Roles</th><th>Actions</th>
     </tr>
     </thead>
     <tbody id="usersBody">
@@ -114,9 +114,10 @@
       tr.innerHTML = `
         <td>${user.id}</td>
         <td>${user.username}</td>
-        <td>${user.name || ''} ${user.lastName || ''}</td>
+        <td>${user.name || ''}</td>
+        <t>${user.lastName || ''}</td>
         <td>${user.email || ''}</td>
-        <td>${user.roles.map(r => r.name).join(', ')}</td>
+        <td>${user.roles.join(', ')}</td>
         <td>
           <button class="btn btn-sm btn-primary" onclick="openEditModal(${user.id})">Edit</button>
           <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">Delete</button>
